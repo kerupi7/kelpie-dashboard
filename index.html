@@ -185,12 +185,41 @@ h1{letter-spacing:-.021em;font-weight:700}
 .tier-t small{display:block;font-weight:400;font-size:11px;margin-top:2px}
 .depts.n3{grid-template-columns:repeat(3,1fr)}
 .depts.n2{grid-template-columns:repeat(2,1fr);max-width:66%;margin:0 auto}
-/* .pane はグリッドの外（#pane-host）に出すので grid-column:1/-1 は無効化する */
+/* .pane は部カードの直下（グリッドの中）に出すので grid-column:1/-1 は無効化する */
 .pane{grid-column:auto;margin-top:16px}
 @media (max-width:980px){
   .depts.n3,.depts.n2{grid-template-columns:repeat(2,1fr);max-width:none}}
 @media (max-width:560px){
   .depts.n3,.depts.n2{grid-template-columns:1fr}}
+
+/* ══════════════════════════════════════════════════════════════
+   その場で開く（部・課とも、押したものの真下に中身を出す）
+   既定は全部閉じている。部カードの下段に「課の状態の点＋件数＋›」を出し、
+   閉じていても課が何個あって何色かは分かるようにする。
+   ══════════════════════════════════════════════════════════════ */
+.card .subs{display:flex;align-items:center;gap:6px;margin-top:8px;
+  font-size:10.5px;font-weight:600;color:var(--muted)}
+.card .subs .dots{display:flex;gap:3px;align-items:center}
+.card .subs .dots i{width:7px;height:7px}
+.chev{font-size:12px;line-height:1;color:var(--muted);
+  transition:transform .15s;display:inline-block}
+.card .subs .chev{margin-left:auto}
+[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.body[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.chev{transition:none}}
+
+/* 開いている部は行いっぱいに広がる。詳細の表が3列グリッドの幅（約370px）に
+   押し込まれると日本語がひどく折り返すため、開いたときだけ全幅にする */
+.dept.open{grid-column:1/-1}
+.pane.inline{margin-top:8px}
+.secs .body{margin-left:12px}
+/* 課の行は「名前 / 一言 / ›」の3列＋下段に補助文字。4つとも明示配置する。
+   自動配置に任せると ›（grid-row指定）と .meta（grid-column指定）がぶつかって並びが崩れる */
+.sec{grid-template-columns:1fr auto auto}
+.sec .nm{grid-column:1;grid-row:1}
+.sec .hot{grid-column:2;grid-row:1}
+.sec .chev{grid-column:3;grid-row:1;color:var(--c)}
+.sec .meta{grid-column:1/-1;grid-row:2}
 
 /* ══════════════════════════════════════════════════════════════
    警告バナー（9.10節）
@@ -223,8 +252,6 @@ h1{letter-spacing:-.021em;font-weight:700}
     <div class="bus"><div class="depts n2" id="grid-backoffice"></div></div>
   </section>
 
-  <div id="pane-host"></div>
-
   <div class="tally" id="tally"></div>
   <div class="legend" id="legend">
     <span><i class="dot g"></i>順調</span><span><i class="dot y"></i>注意・判断待ち</span>
@@ -232,7 +259,7 @@ h1{letter-spacing:-.021em;font-weight:700}
   </div>
 </div>
 
-<script type="application/json" id="dashboard-data">{"generated_at":"2026-07-31T14:41:52+09:00","today":"2026-07-31","company":{"name":"Kelpie.Inc","revenue_current_label":"0円","revenue_current_is_zero":true,"revenue_recorded_stale":false,"goal_label":"40〜60万円","revenue_departments_count":3,"activated_count":0,"launchd_count":"9本","closest_dept":{"name":"X運用部","pct":47}},"alerts":[{"cls":"y","text":"keiba-metrics: 読み込みに失敗したため 9日前の値を表示しています"}],"departments":[{"id":"x","name":"X運用部","path":"businesses/x-operation/","tier":"revenue","order":1,"cls":"y","state_reason":"課に🔴が1つ以上（1段緩和）","state_reason_detail":"品質管理室","goal":"X収益化の解禁（フォロワー500人・30日500万インプ）","goal_status":"fixed","headline":{"kind":"pct","value":"47%","label":"達成率","pct_for_bar":47},"kpis":{"head":["解禁条件（大きいほど良い）","実測","目標","達成率"],"rows":[["フォロワー数","500人","500人","<b>100%（達成）<\/b>"],["直近30日インプレッション","2,328,854","5,000,000","47%"],["平常週のインプレッション（直近4週の中央値）","530,659","1,150,000 相当","46%"]]},"extra_html":"<p class='note'>直近4週のインプレッションは <b>07-11週 530,659 ／ 07-18週 173,328 ／ 07-25週 1,624,867<\/b> と推移しています。 突出した週が1つあり、それを除いた平常運転は中央値の水準です。 この水準が続くと30日で500万には届きません。<\/p>","improvements":["インプレッションを平常時ベースで<b>約2.6倍<\/b>にする。フォロワー条件は達成済みなので、残るボトルネックはこれ1つ","分析レポートv2の旧フロー引退判断（U9）を決める"],"todos":[{"text":"U9：旧KPIフローを引退させるか","status":"判断待ち","severity":"y"},{"text":"<code>settings.json<\/code> の権限設定","status":"未着手","severity":""},{"text":"90日インプレッションの突合","status":"未着手","severity":""},{"text":"死んだKPI系統（<code>kpi-log/<\/code>・2026-03で停止）を畳む","status":"未着手","severity":""}],"lead":"朝5:45の経済ニュース解説スレッド1本と、リプライ運用（朝A/B・交流A/B/C/D）で回っています。 自動投稿は継続して成功しています。会社で唯一、目標に手が届く位置にいます。","sources_used":[{"id":"x-analytics","as_of":"2026-07-28T07:30:04","status":"ok"}],"sections":[{"id":"x1","name":"ニュース解説課","path":"businesses/x-operation/dept/news-thread/","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"1日1本","meta":"最終 07-31","dim":false,"lead":"朝5:45の経済ニュース解説スレッド（5ポスト構成）を作って投稿します。X運用部のメインコンテンツです。","kpis":{"head":["項目","値"],"rows":[["投稿頻度","1日1スレッド"],["直近の投稿","2026-07-31 06:29 成功"],["ドラフト本数","139"]]},"extra_html":"","todos":[],"sources_used":[{"id":"files","as_of":"2026-07-31","status":"ok"},{"id":"x-oplog","as_of":"2026-07-31","status":"ok"}]},{"id":"x2","name":"リプライ課","path":"businesses/x-operation/dept/reply/","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"毎日6グループ","meta":"最終 07-31","dim":false,"lead":"朝のグループA/Bへのリプライと、交流リプライA/B/C/Dを自動投稿します。接触面を広げる役割です。","kpis":{"head":["グループ","直近の実績（成功 / 失敗）"],"rows":[["朝A","成功18件 / 失敗0件"],["朝B","成功19件 / 失敗0件"],["交流A","成功24件 / 失敗0件"],["交流B","成功25件 / 失敗0件"]]},"extra_html":"<p class='note'>Selenium自動投稿。二重起動を防ぐため flock による排他ロックを実装済みです。<\/p>","todos":[],"sources_used":[{"id":"x-oplog","as_of":"2026-07-31","status":"ok"}]},{"id":"x3","name":"経営企画室","path":"businesses/x-operation/dept/management/","cls":"y","state_reason":"期限超過あり","state_reason_detail":"分析レポートv2のU9判断","hot":"KPI2系統","meta":"最終 07-28","dim":false,"lead":"KPIの管理と週次の戦略レビュー。X収益化までのロードマップを持ちます。","kpis":{"head":["KPIの置き場所","最終更新","状態"],"rows":[["<code>analytics/data/<\/code>","2026-07-28T07:30:04","生きている"],["<code>data/kpi-log/<\/code>","2026-03","<b>止まっている<\/b>"]]},"extra_html":"","todos":[{"text":"2系統あるKPIのうち死んだ方を畳む","status":"要判断","severity":"y"},{"text":"分析レポートv2のU9判断","status":"判断待ち","severity":"y"}],"sources_used":[{"id":"x-analytics","as_of":"2026-07-28T07:30:04","status":"ok"}]},{"id":"x4","name":"品質管理室","path":"businesses/x-operation/dept/qa/","cls":"r","state_reason":"90日以上更新なし","state_reason_detail":"101日","hot":"長く停滞","meta":"最終 04-21","dim":false,"lead":"ファクトチェックの規約と品質保証。fact-checker スキルと連携します。","kpis":{"head":["項目","値"],"rows":[["最終コミット","2026-04-21"],["最終更新からの経過（小さいほど良い）","101日"]]},"extra_html":"","todos":[{"text":"規約が長期間更新されていない。実運用と合っているか確認","status":"要確認","severity":"y"}],"sources_used":[{"id":"git","as_of":"2026-07-31","status":"ok"}]},{"id":"x5","name":"旧4部門","path":"businesses/x-operation/dept/contrast-post/","cls":"o","state_reason":"要整理宣言","state_reason_detail":null,"hot":"文書と不一致","meta":"最終 06-16","dim":true,"lead":"CLAUDE.mdは「旧7部門は _archive/ に退避済み」と書いていますが、 contrast-post・eavesdrop-post・essay・tier-thread の4つは今も dept/ 直下に残っています。文書と実態がずれています。","kpis":{"head":["フォルダ","最終コミット","ファイル数"],"rows":[["contrast-post","2026-06-16","0"],["eavesdrop-post","2026-07-24","2"],["essay","2026-06-16","0"],["tier-thread","2026-07-24","1"]]},"extra_html":"","todos":[{"text":"_archive/ へ退避するか、現役として文書に書き戻すか決める","status":"要判断","severity":"y"}],"sources_used":[{"id":"files","as_of":"2026-07-31","status":"ok"},{"id":"git","as_of":"2026-07-31","status":"ok"}]}]},{"id":"k","name":"競馬部","path":"shared/keiba/","tier":"revenue","order":2,"cls":"y","state_reason":"課に🔴が1つ以上（1段緩和）","state_reason_detail":"採点課","goal":"目標未確定（2つの目標が併存しています）","goal_status":"undecided","headline":{"kind":"none","value":null,"label":"目標未確定","pct_for_bar":null},"kpis":{"head":["指標","自分のモデル","市場","差"],"rows":[["単勝的中率（大きいほど良い）","22.0% <span class=\"flag y\">9日前時点<\/span>","32.6% <span class=\"flag y\">9日前時点<\/span>","−10.6pt <span class=\"flag y\">9日前時点<\/span>"],["複勝率（大きいほど良い）","52.8% <span class=\"flag y\">9日前時点<\/span>","64.0% <span class=\"flag y\">9日前時点<\/span>","−11.2pt <span class=\"flag y\">9日前時点<\/span>"],["対数損失（小さいほど良い）","0.2054 <span class=\"flag y\">9日前時点<\/span>","0.2018 <span class=\"flag y\">9日前時点<\/span>","+0.0036 <span class=\"flag y\">9日前時点<\/span>"],["買い目回収率（大きいほど良い）","1.033","1.000（元本）","+0.033"],["対象レース数","9,339 <span class=\"flag y\">9日前時点<\/span>","—","—"]]},"extra_html":"<h3>目標が2つある<\/h3> <table><tr><th>出典<\/th><th>目標<\/th><th>状態<\/th><\/tr> <tr><td><code>roadmap-ml-subscription.md<\/code><\/td><td>回収率110%でサブスク化<\/td><td>実測で否定済み<\/td><\/tr> <tr><td>2026-07-23以降の検証<\/td><td>p_model の最大化<\/td><td>現行の運用方針<\/td><\/tr><\/table> <p class='note'>どちらを正にするか未定のため、達成率が計算できません。 決まったら <code>shared/keiba/status.yaml<\/code> の <code>goal<\/code> と <code>goal_status<\/code> と <code>headline<\/code> を書き換えてください。<\/p>","improvements":["<b>オッズ時系列の前向き収集<\/b>。発走73分前と締切の logloss 差が 0.155 で、これまで積み上げた上乗せ 0.003〜0.007 の <b>20〜50倍<\/b>。ここが最大の未開拓地です","古い目標（回収率110%）を文書から降ろし、1つに絞る"],"todos":[{"text":"単勝の買い目をどうするか（現行0.653 ＜ 1番人気ベタ0.785）","status":"判断待ち","severity":"y"},{"text":"W_MODEL を下げるか（下げると買い目が出なくなる）","status":"判断待ち","severity":"y"},{"text":"fs-9 の配線（<code>ml.json<\/code> に1行足すだけ）","status":"保留","severity":""},{"text":"取消馬に確率が残る不具合（全レースの3.8%）","status":"原因確定・未修正","severity":"r"},{"text":"副1のB→C列 符号反転バグ","status":"原因確定・未修正","severity":"r"}],"lead":"launchd 8ジョブで無人稼働しています。予測サイトを公開中： <a href='https://kerupi7.github.io/keiba-log/'>kerupi7.github.io/keiba-log<\/a>。 会社で最も作業量が多い部です。","sources_used":[{"id":"keiba-metrics","as_of":"2026-07-22","status":"stale"}],"sections":[{"id":"k1","name":"データ取得課","path":"shared/scripts/keiba_fetch_headless.py","cls":"y","state_reason":"判断待ち・要確認あり","state_reason_detail":"オッズ時系列の収集をスケジュール登録するか","hot":"収集判断待ち","meta":"無人稼働","dim":false,"lead":"週末レースの出走表・調教・コース別成績を取得します。有料列（タイム指数・備考）の取得も担当します。","kpis":{"head":["launchd ジョブ","役割","登録"],"rows":[["keiba-fetch","出走表・調教・コース成績","✅ 登録済み"],["keiba-career","馬のキャリア履歴","✅ 登録済み"],["keiba-enrich-premium","タイム指数・備考（有料列）","✅ 登録済み"],["keiba-odds-snapshot","<b>オッズ時系列の収集<\/b>","✅ 登録済み"]]},"extra_html":"<p class='note'>オッズ時系列は最重要の改善項目です。スクリプトは実装済みですが、収集の本格稼働は判断待ちです。<\/p>","todos":[{"text":"オッズ時系列の収集をスケジュール登録するか","status":"判断待ち","severity":"y"}],"sources_used":[{"id":"launchd","as_of":"2026-07-31","status":"ok"}]},{"id":"k2","name":"採点課","path":"shared/scripts/keiba_taska_headless.py","cls":"r","state_reason":"未修正バグ（原因確定・実害あり）","state_reason_detail":"取消馬に確率が残る不具合","hot":"未修正バグ","meta":"土日 6:00","dim":false,"lead":"8次元の採点とMLモデルで各馬の勝率を出します。現行の主力は fs-8（GBMブレンド）です。","kpis":{"head":["項目","値"],"rows":[["採点の次元数","8"],["稼働中のMLモデル","fs-8（GBMブレンド）"],["待機中","fs-9（実装済み・未配線）"],["対象レース数","9,339 <span class=\"flag y\">9日前時点<\/span>"]]},"extra_html":"","todos":[{"text":"fs-9 を配線するか","status":"保留","severity":""},{"text":"取消馬に確率が残る不具合","status":"未修正","severity":"r"}],"sources_used":[{"id":"keiba-metrics","as_of":"2026-07-22","status":"stale"}]},{"id":"k3","name":"公開課","path":"shared/scripts/keiba_taskb_headless.py","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"稼働中","meta":"土日 8-15時","dim":false,"lead":"採点済みのレースを予測サイトへ公開します。出馬表・買い目・診断欄の描画を担当します。","kpis":{"head":["項目","値"],"rows":[["公開先","kerupi7.github.io/keiba-log"],["実行","土日 8〜15時台に毎時"],["直近の追加機能","出馬表トッピング（102-spec）"]]},"extra_html":"","todos":[],"sources_used":[]},{"id":"k4","name":"精算課","path":"shared/scripts/keiba_settle.py","cls":"y","state_reason":"判断待ち・要確認あり","state_reason_detail":"単勝の買い目方式を決める","hot":"券種判断待ち","meta":"無人稼働","dim":false,"lead":"レース結果を取り込み、的中判定と収支の記録を行います。","kpis":{"head":["項目","値"],"rows":[["買い目セレクタの回収率（大きいほど良い）","1.033"],["見送り率","72%"],["主軸の券種","馬連・複勝"]]},"extra_html":"","todos":[{"text":"単勝の買い目方式を決める","status":"判断待ち","severity":"y"}],"sources_used":[]}]},{"id":"n","name":"note運用部","path":"businesses/note-operation/","tier":"revenue","order":3,"cls":"o","state_reason":"休眠宣言","state_reason_detail":null,"goal":"休眠（2026-07-31〜）","goal_status":"fixed","headline":{"kind":"dormant","value":"休眠","label":null,"pct_for_bar":null},"kpis":{"head":["項目","値","備考"],"rows":[["公開記事","27本","2026-05-01〜05-25"],["最終記事からの経過（小さいほど良い）","67日","—"],["売上","0円","全記事無料"],["フォロワー数・スキ率","未計測","機械可読な場所に無い"]]},"extra_html":"<p class='note'>再開条件は決めていません。休眠を選んだ時点で「いつ戻すか」は空白のままです。<\/p>","improvements":[],"todos":[{"text":"再開条件を決めるかどうか","status":"休眠中のため保留","severity":""}],"lead":"有料記事の販売を目指していましたが、2026-07-31に休眠と決めました。 フォルダ・記事29本・スキルはそのまま残しています。戻したくなったら <code>businesses/note-operation/status.yaml<\/code> の <code>dormant<\/code> を <code>false<\/code> にしてください。","sources_used":[{"id":"files","as_of":"2026-07-31","status":"ok"}],"sections":[]},{"id":"s","name":"秘書部","path":"secretary/","tier":"backoffice","order":1,"cls":"y","state_reason":"部自身に判断待ち","state_reason_detail":"secretary-morning の実際の起動元を特定する","goal":"複数部を横断して管理する（売上は持たない）","goal_status":"fixed","headline":{"kind":"steady","value":"稼働","label":null,"pct_for_bar":null},"kpis":{"head":["データ","未対応件数","最古","停滞日数（小さいほど良い）"],"rows":[["backlog（pending）","2","2026-07-23","<b>8日<\/b>"],["ideas","4","—","—"],["retros","1","—","—"],["usecases","8","—","—"]]},"extra_html":"<p class='note'>2026-07-31時点：backlog全16件のうち14件はdone/dropped済み。 残るpendingは2件でどちらも作成から日が浅く、長期停滞はありません。<\/p>","improvements":["朝4:00の司令書タスク（secretary-morning）が、Claudeのスケジュールタスク登録一覧に出てきません。毎朝メールは届いているので動いてはいますが、実際に何が起動しているか特定できていません"],"todos":[{"text":"secretary-morning の実際の起動元を特定する","status":"未確認","severity":"y"}],"lead":"朝4:00の司令書メール・学びノート・メモ管理・メルカリ値下げが稼働しています。 売上は持たず、他の部を支える裏方です。","sources_used":[{"id":"secretary-notes","as_of":"2026-07-31","status":"ok"}],"sections":[{"id":"s1","name":"司令書課","path":"secretary/scripts/build_morning_briefing.py","cls":"y","state_reason":"30日以上更新なし","state_reason_detail":"42日","hot":"稼働中","meta":"毎日 4:00","dim":false,"lead":"天気・予定・タイムスケジュール・学び・BACKLOG・監査を1通のHTMLメールにまとめて送ります。","kpis":{"head":["項目","値"],"rows":[["送信時刻","毎日 4:00"],["構成要素","天気・予定・筋トレ・学び・BACKLOG・監査"]]},"extra_html":"","todos":[],"sources_used":[]},{"id":"s2","name":"学びノート課","path":"secretary/scripts/learning_queue.py","cls":"y","state_reason":"30日以上更新なし","state_reason_detail":"39日","hot":"稼働中","meta":"毎日 3:30","dim":false,"lead":"保存したURLの先頭5件を取得して要約し、Notionの学習4DBへ投入します。司令書の前処理です。","kpis":{"head":["投入先DB","分野"],"rows":[["4DB","行動経済学 / デザイン / 心理学 / マーケティング"]]},"extra_html":"","todos":[],"sources_used":[]},{"id":"s3","name":"メモ課","path":"secretary/data/backlog/","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"稼働中","meta":"随時","dim":false,"lead":"「メモ」で始まる発話を、backlog / ideas / retros / scheduled のどれかに振り分けて保存します。","kpis":{"head":["business タグ","backlog 件数（pending）"],"rows":[["company","2"],["x","0"],["note-operation","0"]]},"extra_html":"<p class='note'><code>my-project<\/code> タグは 2026-07-31 に廃止。筋トレ・学習記録は <code>company<\/code> に移しました。<\/p>","todos":[],"sources_used":[{"id":"secretary-notes","as_of":"2026-07-31","status":"ok"}]},{"id":"s4","name":"メルカリ課","path":".claude/commands/mercari-price-drop.md","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"稼働中","meta":"水・金・日 20:00","dim":false,"lead":"登録した出品商品を週3回、100円ずつ値下げします。下限価格と当日実施済みはスキップします。","kpis":{"head":["項目","値"],"rows":[["実行","水・金・日 20:00"],["値下げ幅","100円"]]},"extra_html":"","todos":[],"sources_used":[]}]},{"id":"f","name":"ファッション部","path":"businesses/stylist/","tier":"backoffice","order":2,"cls":"r","state_reason":"主目標が構造的に達成不能","state_reason_detail":"launchd が未登録。このままだと 2026-09-01 の自動実行は起きません","goal":"2026-09-01 に無人で完走する","goal_status":"fixed","headline":{"kind":"ratio","value":"67%","label":"準備","pct_for_bar":67},"kpis":{"head":["準備項目","状態"],"rows":[["実装・オーケストレーター（<code>stylist_run.py<\/code>）","✅ 完了"],["知識ベース（ジャンル20×配色6×シルエット4）","✅ 完了"],["launchd <code>inc.kelpie.stylist-seasonal<\/code> の登録","🔴 未了"]]},"extra_html":"<p class='note'><b>launchd が未登録のままだと 2026-09-01 は動きません。<\/b> 登録は人間の作業です（<code>~/Library/LaunchAgents/<\/code> に置く）。 登録すればこの警告は次のビルドで自動的に消えます。<\/p>","improvements":["仕入れ先がUNIQLO/GUだけで在庫が薄く、<b>靴は実在0〜2件<\/b>しか拾えません。ここが出力品質の天井です"],"todos":[{"text":"launchd の登録","status":"未実施","severity":"r"},{"text":"Tier2ショップ（ZOZO/無印/ZARA）の解禁判断","status":"要判断","severity":"y"}],"lead":"年4回（3/1・6/1・9/1・12/1 07:00）に、187cm/75kgメンズ向けの季節コーデを無人提案する 個人ユーティリティです。事業ではないので売上目標はありません。","sources_used":[{"id":"launchd","as_of":"2026-07-31","status":"ok"}],"sections":[{"id":"f1","name":"商品取得課","path":"businesses/stylist/scripts/fetch_products.py","cls":"y","state_reason":"判断待ち・要確認あり","state_reason_detail":"Tier2ショップを解禁するか","hot":"靴が薄い","meta":"UNIQLO/GU","dim":false,"lead":"設定したショップから実在商品をHTTP直取得します。ZOZO・無印・ZARAはTier2として無効化中です。","kpis":{"head":["ジャンル","拾える靴の実在数（大きいほど良い）"],"rows":[["all_black","0件"],["french","1件"],["city","2件"]]},"extra_html":"","todos":[{"text":"Tier2ショップを解禁するか","status":"要判断","severity":"y"}],"sources_used":[]},{"id":"f2","name":"コーデ生成課","path":"businesses/stylist/scripts/generate_outfits.py","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"実装済み","meta":"claude -p","dim":false,"lead":"知識ベースのレシピに沿って5ジャンル×各1コーデを組み立てます。LLMが落ちてもルールベースで必ず完走します。","kpis":{"head":["項目","値"],"rows":[["ジャンル","20"],["配色","6"],["シルエット","4"],["1回の出力","5コーデ"]]},"extra_html":"","todos":[],"sources_used":[]},{"id":"f3","name":"配信課","path":"businesses/stylist/scripts/render_mail.py","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"実装済み","meta":"HTMLメール","dim":false,"lead":"完成したコーデをHTMLメールで送ります。画像生成プロンプトも同梱します。","kpis":{"head":["項目","値"],"rows":[["形式","HTMLメール"],["同梱物","購入リンク・価格・画像生成プロンプト"]]},"extra_html":"","todos":[],"sources_used":[]}]}]}</script>
+<script type="application/json" id="dashboard-data">{"generated_at":"2026-07-31T15:06:22+09:00","today":"2026-07-31","company":{"name":"Kelpie.Inc","revenue_current_label":"0円","revenue_current_is_zero":true,"revenue_recorded_stale":false,"goal_label":"40〜60万円","revenue_departments_count":3,"activated_count":0,"launchd_count":"9本","closest_dept":{"name":"X運用部","pct":47}},"alerts":[{"cls":"y","text":"keiba-metrics: 読み込みに失敗したため 9日前の値を表示しています"}],"departments":[{"id":"x","name":"X運用部","path":"businesses/x-operation/","tier":"revenue","order":1,"cls":"y","state_reason":"課に🔴が1つ以上（1段緩和）","state_reason_detail":"品質管理室","goal":"X収益化の解禁（フォロワー500人・30日500万インプ）","goal_status":"fixed","headline":{"kind":"pct","value":"47%","label":"達成率","pct_for_bar":47},"kpis":{"head":["解禁条件（大きいほど良い）","実測","目標","達成率"],"rows":[["フォロワー数","500人","500人","<b>100%（達成）<\/b>"],["直近30日インプレッション","2,328,854","5,000,000","47%"],["平常週のインプレッション（直近4週の中央値）","530,659","1,150,000 相当","46%"]]},"extra_html":"<p class='note'>直近4週のインプレッションは <b>07-11週 530,659 ／ 07-18週 173,328 ／ 07-25週 1,624,867<\/b> と推移しています。 突出した週が1つあり、それを除いた平常運転は中央値の水準です。 この水準が続くと30日で500万には届きません。<\/p>","improvements":["インプレッションを平常時ベースで<b>約2.6倍<\/b>にする。フォロワー条件は達成済みなので、残るボトルネックはこれ1つ","分析レポートv2の旧フロー引退判断（U9）を決める"],"todos":[{"text":"U9：旧KPIフローを引退させるか","status":"判断待ち","severity":"y"},{"text":"<code>settings.json<\/code> の権限設定","status":"未着手","severity":""},{"text":"90日インプレッションの突合","status":"未着手","severity":""},{"text":"死んだKPI系統（<code>kpi-log/<\/code>・2026-03で停止）を畳む","status":"未着手","severity":""}],"lead":"朝5:45の経済ニュース解説スレッド1本と、リプライ運用（朝A/B・交流A/B/C/D）で回っています。 自動投稿は継続して成功しています。会社で唯一、目標に手が届く位置にいます。","sources_used":[{"id":"x-analytics","as_of":"2026-07-28T07:30:04","status":"ok"}],"sections":[{"id":"x1","name":"ニュース解説課","path":"businesses/x-operation/dept/news-thread/","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"1日1本","meta":"最終 07-31","dim":false,"lead":"朝5:45の経済ニュース解説スレッド（5ポスト構成）を作って投稿します。X運用部のメインコンテンツです。","kpis":{"head":["項目","値"],"rows":[["投稿頻度","1日1スレッド"],["直近の投稿","2026-07-31 06:29 成功"],["ドラフト本数","139"]]},"extra_html":"","todos":[],"sources_used":[{"id":"files","as_of":"2026-07-31","status":"ok"},{"id":"x-oplog","as_of":"2026-07-31","status":"ok"}]},{"id":"x2","name":"リプライ課","path":"businesses/x-operation/dept/reply/","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"毎日6グループ","meta":"最終 07-31","dim":false,"lead":"朝のグループA/Bへのリプライと、交流リプライA/B/C/Dを自動投稿します。接触面を広げる役割です。","kpis":{"head":["グループ","直近の実績（成功 / 失敗）"],"rows":[["朝A","成功18件 / 失敗0件"],["朝B","成功19件 / 失敗0件"],["交流A","成功24件 / 失敗0件"],["交流B","成功25件 / 失敗0件"]]},"extra_html":"<p class='note'>Selenium自動投稿。二重起動を防ぐため flock による排他ロックを実装済みです。<\/p>","todos":[],"sources_used":[{"id":"x-oplog","as_of":"2026-07-31","status":"ok"}]},{"id":"x3","name":"経営企画室","path":"businesses/x-operation/dept/management/","cls":"y","state_reason":"期限超過あり","state_reason_detail":"分析レポートv2のU9判断","hot":"KPI2系統","meta":"最終 07-28","dim":false,"lead":"KPIの管理と週次の戦略レビュー。X収益化までのロードマップを持ちます。","kpis":{"head":["KPIの置き場所","最終更新","状態"],"rows":[["<code>analytics/data/<\/code>","2026-07-28T07:30:04","生きている"],["<code>data/kpi-log/<\/code>","2026-03","<b>止まっている<\/b>"]]},"extra_html":"","todos":[{"text":"2系統あるKPIのうち死んだ方を畳む","status":"要判断","severity":"y"},{"text":"分析レポートv2のU9判断","status":"判断待ち","severity":"y"}],"sources_used":[{"id":"x-analytics","as_of":"2026-07-28T07:30:04","status":"ok"}]},{"id":"x4","name":"品質管理室","path":"businesses/x-operation/dept/qa/","cls":"r","state_reason":"90日以上更新なし","state_reason_detail":"101日","hot":"長く停滞","meta":"最終 04-21","dim":false,"lead":"ファクトチェックの規約と品質保証。fact-checker スキルと連携します。","kpis":{"head":["項目","値"],"rows":[["最終コミット","2026-04-21"],["最終更新からの経過（小さいほど良い）","101日"]]},"extra_html":"","todos":[{"text":"規約が長期間更新されていない。実運用と合っているか確認","status":"要確認","severity":"y"}],"sources_used":[{"id":"git","as_of":"2026-07-31","status":"ok"}]},{"id":"x5","name":"旧4部門","path":"businesses/x-operation/dept/contrast-post/","cls":"o","state_reason":"要整理宣言","state_reason_detail":null,"hot":"文書と不一致","meta":"最終 06-16","dim":true,"lead":"CLAUDE.mdは「旧7部門は _archive/ に退避済み」と書いていますが、 contrast-post・eavesdrop-post・essay・tier-thread の4つは今も dept/ 直下に残っています。文書と実態がずれています。","kpis":{"head":["フォルダ","最終コミット","ファイル数"],"rows":[["contrast-post","2026-06-16","0"],["eavesdrop-post","2026-07-24","2"],["essay","2026-06-16","0"],["tier-thread","2026-07-24","1"]]},"extra_html":"","todos":[{"text":"_archive/ へ退避するか、現役として文書に書き戻すか決める","status":"要判断","severity":"y"}],"sources_used":[{"id":"files","as_of":"2026-07-31","status":"ok"},{"id":"git","as_of":"2026-07-31","status":"ok"}]}]},{"id":"k","name":"競馬部","path":"shared/keiba/","tier":"revenue","order":2,"cls":"y","state_reason":"課に🔴が1つ以上（1段緩和）","state_reason_detail":"採点課","goal":"目標未確定（2つの目標が併存しています）","goal_status":"undecided","headline":{"kind":"none","value":null,"label":"目標未確定","pct_for_bar":null},"kpis":{"head":["指標","自分のモデル","市場","差"],"rows":[["単勝的中率（大きいほど良い）","22.0% <span class=\"flag y\">9日前時点<\/span>","32.6% <span class=\"flag y\">9日前時点<\/span>","−10.6pt <span class=\"flag y\">9日前時点<\/span>"],["複勝率（大きいほど良い）","52.8% <span class=\"flag y\">9日前時点<\/span>","64.0% <span class=\"flag y\">9日前時点<\/span>","−11.2pt <span class=\"flag y\">9日前時点<\/span>"],["対数損失（小さいほど良い）","0.2054 <span class=\"flag y\">9日前時点<\/span>","0.2018 <span class=\"flag y\">9日前時点<\/span>","+0.0036 <span class=\"flag y\">9日前時点<\/span>"],["買い目回収率（大きいほど良い）","1.033","1.000（元本）","+0.033"],["対象レース数","9,339 <span class=\"flag y\">9日前時点<\/span>","—","—"]]},"extra_html":"<h3>目標が2つある<\/h3> <table><tr><th>出典<\/th><th>目標<\/th><th>状態<\/th><\/tr> <tr><td><code>roadmap-ml-subscription.md<\/code><\/td><td>回収率110%でサブスク化<\/td><td>実測で否定済み<\/td><\/tr> <tr><td>2026-07-23以降の検証<\/td><td>p_model の最大化<\/td><td>現行の運用方針<\/td><\/tr><\/table> <p class='note'>どちらを正にするか未定のため、達成率が計算できません。 決まったら <code>shared/keiba/status.yaml<\/code> の <code>goal<\/code> と <code>goal_status<\/code> と <code>headline<\/code> を書き換えてください。<\/p>","improvements":["<b>オッズ時系列の前向き収集<\/b>。発走73分前と締切の logloss 差が 0.155 で、これまで積み上げた上乗せ 0.003〜0.007 の <b>20〜50倍<\/b>。ここが最大の未開拓地です","古い目標（回収率110%）を文書から降ろし、1つに絞る"],"todos":[{"text":"単勝の買い目をどうするか（現行0.653 ＜ 1番人気ベタ0.785）","status":"判断待ち","severity":"y"},{"text":"W_MODEL を下げるか（下げると買い目が出なくなる）","status":"判断待ち","severity":"y"},{"text":"fs-9 の配線（<code>ml.json<\/code> に1行足すだけ）","status":"保留","severity":""},{"text":"取消馬に確率が残る不具合（全レースの3.8%）","status":"原因確定・未修正","severity":"r"},{"text":"副1のB→C列 符号反転バグ","status":"原因確定・未修正","severity":"r"}],"lead":"launchd 8ジョブで無人稼働しています。予測サイトを公開中： <a href='https://kerupi7.github.io/keiba-log/'>kerupi7.github.io/keiba-log<\/a>。 会社で最も作業量が多い部です。","sources_used":[{"id":"keiba-metrics","as_of":"2026-07-22","status":"stale"}],"sections":[{"id":"k1","name":"データ取得課","path":"shared/scripts/keiba_fetch_headless.py","cls":"y","state_reason":"判断待ち・要確認あり","state_reason_detail":"オッズ時系列の収集をスケジュール登録するか","hot":"収集判断待ち","meta":"無人稼働","dim":false,"lead":"週末レースの出走表・調教・コース別成績を取得します。有料列（タイム指数・備考）の取得も担当します。","kpis":{"head":["launchd ジョブ","役割","登録"],"rows":[["keiba-fetch","出走表・調教・コース成績","✅ 登録済み"],["keiba-career","馬のキャリア履歴","✅ 登録済み"],["keiba-enrich-premium","タイム指数・備考（有料列）","✅ 登録済み"],["keiba-odds-snapshot","<b>オッズ時系列の収集<\/b>","✅ 登録済み"]]},"extra_html":"<p class='note'>オッズ時系列は最重要の改善項目です。スクリプトは実装済みですが、収集の本格稼働は判断待ちです。<\/p>","todos":[{"text":"オッズ時系列の収集をスケジュール登録するか","status":"判断待ち","severity":"y"}],"sources_used":[{"id":"launchd","as_of":"2026-07-31","status":"ok"}]},{"id":"k2","name":"採点課","path":"shared/scripts/keiba_taska_headless.py","cls":"r","state_reason":"未修正バグ（原因確定・実害あり）","state_reason_detail":"取消馬に確率が残る不具合","hot":"未修正バグ","meta":"土日 6:00","dim":false,"lead":"8次元の採点とMLモデルで各馬の勝率を出します。現行の主力は fs-8（GBMブレンド）です。","kpis":{"head":["項目","値"],"rows":[["採点の次元数","8"],["稼働中のMLモデル","fs-8（GBMブレンド）"],["待機中","fs-9（実装済み・未配線）"],["対象レース数","9,339 <span class=\"flag y\">9日前時点<\/span>"]]},"extra_html":"","todos":[{"text":"fs-9 を配線するか","status":"保留","severity":""},{"text":"取消馬に確率が残る不具合","status":"未修正","severity":"r"}],"sources_used":[{"id":"keiba-metrics","as_of":"2026-07-22","status":"stale"}]},{"id":"k3","name":"公開課","path":"shared/scripts/keiba_taskb_headless.py","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"稼働中","meta":"土日 8-15時","dim":false,"lead":"採点済みのレースを予測サイトへ公開します。出馬表・買い目・診断欄の描画を担当します。","kpis":{"head":["項目","値"],"rows":[["公開先","kerupi7.github.io/keiba-log"],["実行","土日 8〜15時台に毎時"],["直近の追加機能","出馬表トッピング（102-spec）"]]},"extra_html":"","todos":[],"sources_used":[]},{"id":"k4","name":"精算課","path":"shared/scripts/keiba_settle.py","cls":"y","state_reason":"判断待ち・要確認あり","state_reason_detail":"単勝の買い目方式を決める","hot":"券種判断待ち","meta":"無人稼働","dim":false,"lead":"レース結果を取り込み、的中判定と収支の記録を行います。","kpis":{"head":["項目","値"],"rows":[["買い目セレクタの回収率（大きいほど良い）","1.033"],["見送り率","72%"],["主軸の券種","馬連・複勝"]]},"extra_html":"","todos":[{"text":"単勝の買い目方式を決める","status":"判断待ち","severity":"y"}],"sources_used":[]}]},{"id":"n","name":"note運用部","path":"businesses/note-operation/","tier":"revenue","order":3,"cls":"o","state_reason":"休眠宣言","state_reason_detail":null,"goal":"休眠（2026-07-31〜）","goal_status":"fixed","headline":{"kind":"dormant","value":"休眠","label":null,"pct_for_bar":null},"kpis":{"head":["項目","値","備考"],"rows":[["公開記事","27本","2026-05-01〜05-25"],["最終記事からの経過（小さいほど良い）","67日","—"],["売上","0円","全記事無料"],["フォロワー数・スキ率","未計測","機械可読な場所に無い"]]},"extra_html":"<p class='note'>再開条件は決めていません。休眠を選んだ時点で「いつ戻すか」は空白のままです。<\/p>","improvements":[],"todos":[{"text":"再開条件を決めるかどうか","status":"休眠中のため保留","severity":""}],"lead":"有料記事の販売を目指していましたが、2026-07-31に休眠と決めました。 フォルダ・記事29本・スキルはそのまま残しています。戻したくなったら <code>businesses/note-operation/status.yaml<\/code> の <code>dormant<\/code> を <code>false<\/code> にしてください。","sources_used":[{"id":"files","as_of":"2026-07-31","status":"ok"}],"sections":[]},{"id":"s","name":"秘書部","path":"secretary/","tier":"backoffice","order":1,"cls":"y","state_reason":"部自身に判断待ち","state_reason_detail":"secretary-morning の実際の起動元を特定する","goal":"複数部を横断して管理する（売上は持たない）","goal_status":"fixed","headline":{"kind":"steady","value":"稼働","label":null,"pct_for_bar":null},"kpis":{"head":["データ","未対応件数","最古","停滞日数（小さいほど良い）"],"rows":[["backlog（pending）","2","2026-07-23","<b>8日<\/b>"],["ideas","4","—","—"],["retros","1","—","—"],["usecases","8","—","—"]]},"extra_html":"<p class='note'>2026-07-31時点：backlog全16件のうち14件はdone/dropped済み。 残るpendingは2件でどちらも作成から日が浅く、長期停滞はありません。<\/p>","improvements":["朝4:00の司令書タスク（secretary-morning）が、Claudeのスケジュールタスク登録一覧に出てきません。毎朝メールは届いているので動いてはいますが、実際に何が起動しているか特定できていません"],"todos":[{"text":"secretary-morning の実際の起動元を特定する","status":"未確認","severity":"y"}],"lead":"朝4:00の司令書メール・学びノート・メモ管理・メルカリ値下げが稼働しています。 売上は持たず、他の部を支える裏方です。","sources_used":[{"id":"secretary-notes","as_of":"2026-07-31","status":"ok"}],"sections":[{"id":"s1","name":"司令書課","path":"secretary/scripts/build_morning_briefing.py","cls":"y","state_reason":"30日以上更新なし","state_reason_detail":"42日","hot":"稼働中","meta":"毎日 4:00","dim":false,"lead":"天気・予定・タイムスケジュール・学び・BACKLOG・監査を1通のHTMLメールにまとめて送ります。","kpis":{"head":["項目","値"],"rows":[["送信時刻","毎日 4:00"],["構成要素","天気・予定・筋トレ・学び・BACKLOG・監査"]]},"extra_html":"","todos":[],"sources_used":[]},{"id":"s2","name":"学びノート課","path":"secretary/scripts/learning_queue.py","cls":"y","state_reason":"30日以上更新なし","state_reason_detail":"39日","hot":"稼働中","meta":"毎日 3:30","dim":false,"lead":"保存したURLの先頭5件を取得して要約し、Notionの学習4DBへ投入します。司令書の前処理です。","kpis":{"head":["投入先DB","分野"],"rows":[["4DB","行動経済学 / デザイン / 心理学 / マーケティング"]]},"extra_html":"","todos":[],"sources_used":[]},{"id":"s3","name":"メモ課","path":"secretary/data/backlog/","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"稼働中","meta":"随時","dim":false,"lead":"「メモ」で始まる発話を、backlog / ideas / retros / scheduled のどれかに振り分けて保存します。","kpis":{"head":["business タグ","backlog 件数（pending）"],"rows":[["company","2"],["x","0"],["note-operation","0"]]},"extra_html":"<p class='note'><code>my-project<\/code> タグは 2026-07-31 に廃止。筋トレ・学習記録は <code>company<\/code> に移しました。<\/p>","todos":[],"sources_used":[{"id":"secretary-notes","as_of":"2026-07-31","status":"ok"}]},{"id":"s4","name":"メルカリ課","path":".claude/commands/mercari-price-drop.md","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"稼働中","meta":"水・金・日 20:00","dim":false,"lead":"登録した出品商品を週3回、100円ずつ値下げします。下限価格と当日実施済みはスキップします。","kpis":{"head":["項目","値"],"rows":[["実行","水・金・日 20:00"],["値下げ幅","100円"]]},"extra_html":"","todos":[],"sources_used":[]}]},{"id":"f","name":"ファッション部","path":"businesses/stylist/","tier":"backoffice","order":2,"cls":"r","state_reason":"主目標が構造的に達成不能","state_reason_detail":"launchd が未登録。このままだと 2026-09-01 の自動実行は起きません","goal":"2026-09-01 に無人で完走する","goal_status":"fixed","headline":{"kind":"ratio","value":"67%","label":"準備","pct_for_bar":67},"kpis":{"head":["準備項目","状態"],"rows":[["実装・オーケストレーター（<code>stylist_run.py<\/code>）","✅ 完了"],["知識ベース（ジャンル20×配色6×シルエット4）","✅ 完了"],["launchd <code>inc.kelpie.stylist-seasonal<\/code> の登録","🔴 未了"]]},"extra_html":"<p class='note'><b>launchd が未登録のままだと 2026-09-01 は動きません。<\/b> 登録は人間の作業です（<code>~/Library/LaunchAgents/<\/code> に置く）。 登録すればこの警告は次のビルドで自動的に消えます。<\/p>","improvements":["仕入れ先がUNIQLO/GUだけで在庫が薄く、<b>靴は実在0〜2件<\/b>しか拾えません。ここが出力品質の天井です"],"todos":[{"text":"launchd の登録","status":"未実施","severity":"r"},{"text":"Tier2ショップ（ZOZO/無印/ZARA）の解禁判断","status":"要判断","severity":"y"}],"lead":"年4回（3/1・6/1・9/1・12/1 07:00）に、187cm/75kgメンズ向けの季節コーデを無人提案する 個人ユーティリティです。事業ではないので売上目標はありません。","sources_used":[{"id":"launchd","as_of":"2026-07-31","status":"ok"}],"sections":[{"id":"f1","name":"商品取得課","path":"businesses/stylist/scripts/fetch_products.py","cls":"y","state_reason":"判断待ち・要確認あり","state_reason_detail":"Tier2ショップを解禁するか","hot":"靴が薄い","meta":"UNIQLO/GU","dim":false,"lead":"設定したショップから実在商品をHTTP直取得します。ZOZO・無印・ZARAはTier2として無効化中です。","kpis":{"head":["ジャンル","拾える靴の実在数（大きいほど良い）"],"rows":[["all_black","0件"],["french","1件"],["city","2件"]]},"extra_html":"","todos":[{"text":"Tier2ショップを解禁するか","status":"要判断","severity":"y"}],"sources_used":[]},{"id":"f2","name":"コーデ生成課","path":"businesses/stylist/scripts/generate_outfits.py","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"実装済み","meta":"claude -p","dim":false,"lead":"知識ベースのレシピに沿って5ジャンル×各1コーデを組み立てます。LLMが落ちてもルールベースで必ず完走します。","kpis":{"head":["項目","値"],"rows":[["ジャンル","20"],["配色","6"],["シルエット","4"],["1回の出力","5コーデ"]]},"extra_html":"","todos":[],"sources_used":[]},{"id":"f3","name":"配信課","path":"businesses/stylist/scripts/render_mail.py","cls":"g","state_reason":"どれもなし","state_reason_detail":null,"hot":"実装済み","meta":"HTMLメール","dim":false,"lead":"完成したコーデをHTMLメールで送ります。画像生成プロンプトも同梱します。","kpis":{"head":["項目","値"],"rows":[["形式","HTMLメール"],["同梱物","購入リンク・価格・画像生成プロンプト"]]},"extra_html":"","todos":[],"sources_used":[]}]}]}</script>
 <script>
 /* ══════════════════════════════════════════════════════════════
    データ読み込み（9.1節：repo-viewer方式。application/json + JSON.parse）
@@ -257,22 +284,19 @@ h1{letter-spacing:-.021em;font-weight:700}
      }, ...]
    }
    ══════════════════════════════════════════════════════════════ */
-const D = JSON.parse(document.getElementById('dashboard-data').textContent);
+/* このファイル（テンプレ）を直接開くと、下の script が差し込み前の目印のままなので
+   JSON.parse が失敗する。以前はここで例外が出て真っ黒なページになり、故障と見分けが
+   付かなかった。案内を出して止める。
+   ※この近くに差し込み用の目印を書き写さないこと。render が全部置換するため、
+     コメントの中にまでJSONが流し込まれてファイルが倍に膨らむ（実際にやった） */
+let D = null;
+try { D = JSON.parse(document.getElementById('dashboard-data').textContent); } catch(e) { D = null; }
 
 const STATE_LABEL = {g:'順調', y:'注意・判断待ち', r:'止まっている', o:'休眠'};
 
 function tbl(k){ if(!k) return "";
   return '<table><tr>'+k.head.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+
     k.rows.map(r=>'<tr>'+r.map((c,i)=>'<td'+(i&&/^[\d,.\-−+%]+$/.test(String(c))?' class="n"':'')+'>'+c+'</td>').join('')+'</tr>').join('')+'</table>';
-}
-
-function find(id){
-  for(const d of D.departments){
-    if(d.id===id) return [d,false];
-    const s=(d.sections||[]).find(s=>s.id===id);
-    if(s) return [s,true];
-  }
-  return [null,false];
 }
 
 /* 9.9節：詳細パネルの中身の組み立て（8ブロック・空のブロックは見出しごと省略） */
@@ -305,37 +329,58 @@ function headlineHTML(h){
   return '<div class="num">'+(h.value||'—')+(h.label?'<small>'+h.label+'</small>':'')+'</div>';
 }
 
+/* 既定は全部閉じている。開いている部・課のidをここに持つ（複数同時に開ける） */
+const openDepts = new Set();
+const openSecs  = new Set();
+
+/* 押したものの真下に出す詳細パネル。ページ末尾には出さない（9.8.1節） */
+function paneHTML(o, isSec){
+  return '<div class="pane inline '+o.cls+'"><div class="ph">'+
+    '<span class="flag '+o.cls+'">'+(isSec?'課':'部')+'</span>'+
+    '<h3 class="t">'+o.name+'</h3>'+
+    '<button class="x" data-close="'+o.id+'" aria-label="閉じる">×</button></div>'+
+    '<div class="dtl">'+detail(o)+'</div></div>';
+}
+
+/* 閉じている間も課の数と色が分かるように、部カードの下段に点を並べる */
+function subsHTML(d){
+  const secs = d.sections || [];
+  if(!secs.length) return '';
+  return '<div class="subs"><span class="dots">'+
+    secs.map(s=>'<i class="dot '+s.cls+'" title="'+s.name+'：'+STATE_LABEL[s.cls]+'"></i>').join('')+
+    '</span><span>課'+secs.length+'</span><span class="chev" aria-hidden="true">›</span></div>';
+}
+
+function secsHTML(d){
+  const secs = d.sections || [];
+  if(!secs.length) return '';
+  return '<div class="secs">'+secs.map(s=>{
+    const on = openSecs.has(s.id);
+    return '<button class="sec '+s.cls+(s.dim?' dim':'')+'" data-k="'+s.id+
+      '" aria-expanded="'+on+'" aria-controls="body-'+s.id+'">'+
+      '<span class="nm">'+s.name+'</span><span class="hot">'+(s.hot||'')+'</span>'+
+      '<span class="chev" aria-hidden="true">›</span>'+
+      '<span class="meta">'+(s.meta||'')+'</span></button>'+
+      '<div class="body" id="body-'+s.id+'"'+(on?'':' hidden')+'>'+(on?paneHTML(s,true):'')+'</div>';
+  }).join('')+'</div>';
+}
+
 function cardHTML(d){
-  return '<div class="dept"><button class="card '+d.cls+'" data-k="'+d.id+'">'+
+  const on = openDepts.has(d.id);
+  return '<div class="dept'+(on?' open':'')+'">'+
+    '<button class="card '+d.cls+'" data-k="'+d.id+'" aria-expanded="'+on+'" aria-controls="body-'+d.id+'">'+
     '<div class="nm">'+d.name+'</div><div class="st">'+STATE_LABEL[d.cls]+'</div>'+
     headlineHTML(d.headline)+
+    subsHTML(d)+
     '</button>'+
-    ((d.sections && d.sections.length) ? '<div class="secs">'+d.sections.map(s=>
-      '<button class="sec '+s.cls+(s.dim?' dim':'')+'" data-k="'+s.id+'">'+
-      '<span class="nm">'+s.name+'</span><span class="hot">'+(s.hot||'')+'</span>'+
-      '<span class="meta">'+(s.meta||'')+'</span></button>').join('') + '</div>' : '')+
-    '</div>';
+    '<div class="body" id="body-'+d.id+'"'+(on?'':' hidden')+'>'+
+    (on ? paneHTML(d,false)+secsHTML(d) : '')+
+    '</div></div>';
 }
 
 function drawTier(tierId, hostId){
   document.getElementById(hostId).innerHTML =
     D.departments.filter(d=>d.tier===tierId).map(cardHTML).join('');
-}
-
-let sel = null;
-
-function openPane(){
-  const host = document.getElementById('pane-host');
-  if(!sel){ host.innerHTML=''; return; }
-  const [o, isSec] = find(sel);
-  if(!o){ sel = null; host.innerHTML=''; return; }
-  host.innerHTML = '<div class="pane '+o.cls+'"><div class="ph">'+
-    '<span class="flag '+o.cls+'">'+(isSec?'課':'部')+'</span>'+
-    '<h3 class="t">'+o.name+'</h3>'+
-    '<button class="x" data-close aria-label="閉じる">×</button></div>'+
-    '<div class="dtl">'+detail(o)+'</div></div>';
-  const paneEl = host.querySelector('.pane');
-  if(paneEl) paneEl.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 function renderCompany(){
@@ -376,21 +421,50 @@ function renderMeta(){
     dynamicAlerts.concat(staticAlerts).map(a=>'<div class="alert '+a.cls+'">⚠️ '+a.text+'</div>').join('');
 }
 
+function drawAll(){
+  drawTier('revenue', 'grid-revenue');
+  drawTier('backoffice', 'grid-backoffice');
+}
+
+/* 部を閉じるときは、その部の課の詳細も閉じる（隠れたまま開きっぱなしにしない） */
+function closeNode(id){
+  if(openDepts.has(id)){
+    openDepts.delete(id);
+    const d = D.departments.find(x=>x.id===id);
+    ((d && d.sections) || []).forEach(s=>openSecs.delete(s.id));
+  } else {
+    openSecs.delete(id);
+  }
+}
+
 document.addEventListener('click', e=>{
-  if(e.target.closest('[data-close]')){ sel=null; openPane(); return; }
+  const closeBtn = e.target.closest('[data-close]');
+  if(closeBtn){ closeNode(closeBtn.dataset.close); drawAll(); return; }
   const b = e.target.closest('[data-k]');
   if(!b) return;
-  sel = (sel===b.dataset.k) ? null : b.dataset.k;
-  openPane();
+  const k = b.dataset.k;
+  const set = b.classList.contains('card') ? openDepts : openSecs;
+  if(set.has(k)) closeNode(k); else set.add(k);
+  drawAll();
 });
-document.addEventListener('keydown', e=>{ if(e.key==='Escape' && sel){ sel=null; openPane(); } });
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && (openDepts.size || openSecs.size)){
+    openDepts.clear(); openSecs.clear(); drawAll();
+  }
+});
 
-renderMeta();
-renderCompany();
-drawTier('revenue', 'grid-revenue');
-drawTier('backoffice', 'grid-backoffice');
-renderTally();
-openPane();
+if(D){
+  renderMeta();
+  renderCompany();
+  drawAll();
+  renderTally();
+}else{
+  document.getElementById('sub').textContent = 'データが入っていません';
+  document.getElementById('alerts').innerHTML =
+    '<div class="alert y">⚠️ これは<b>ひな型のファイル</b>で、中身は入っていません。'+
+    '出来上がったページはこちらです：<code>docs/company-dashboard/out/index.html</code>'+
+    '<br>作り直すときは <code>python3 shared/scripts/build_dashboard.py run</code></div>';
+}
 </script>
 <script>
 (function(){
